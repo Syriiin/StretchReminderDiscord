@@ -52,21 +52,34 @@ async def on_message(message):
 @client.event
 async def on_member_update(before, after):
     # check if member has a reminder role
-    reminder_role = discord.utils.find(lambda r: r.name.endswith(" hour"), after.roles)
+    reminder_role = discord.utils.find(lambda r: "hour" in r.name, after.roles):
     if not reminder_role:
         return
 
     global reminders
-    # if user wasnt playing osu, and now is
-    if (before.game == None or before.game.name != "osu!") and (after.game != None and after.game.name == "osu!"):
-        # set reminder
-        reminders.append(Reminder(after))
-        logging.info("Set reminder for {} ({})".format(after.name, after.id))
-    # elif user was playing osu, and now isnt
-    elif (before.game != None and before.game.name == "osu!") and (after.game == None or after.game.name != "osu!"):
-        # cancel reminder
-        reminders = [r for r in reminders if r.member != after]
-        logging.info("Cancelled reminder for {} ({})".format(after.name, after.id))
+    # if member only wants to be notified while playing osu
+    if "any" not in reminder_role:
+        # if user wasnt playing osu, and now is
+        if (before.game == None or before.game.name != "osu!") and (after.game != None and after.game.name == "osu!"):
+            # set reminder
+            reminders.append(Reminder(after))
+            logging.info("Set reminder for {} ({})".format(after.name, after.id))
+        # elif user was playing osu, and now isnt
+        elif (before.game != None and before.game.name == "osu!") and (after.game == None or after.game.name != "osu!"):
+            # cancel reminder
+            reminders = [r for r in reminders if r.member != after]
+            logging.info("Cancelled reminder for {} ({})".format(after.name, after.id))
+    else:
+        # if user wasnt playing a game
+        if before.game == None and after.game != None:
+            # set reminder
+            reminders.append(Reminder(after))
+            logging.info("Set reminder for {} ({})".format(after.name, after.id))
+        # elif user was playing a game, and now isnt
+        elif before.game != None and after.game == None:
+            # cancel reminder
+            reminders = [r for r in reminders if r.member != after]
+            logging.info("Cancelled reminder for {} ({})".format(after.name, after.id))
 
 async def update_role(message):
     role_name = message.content.split(maxsplit=1)[1].lower()
