@@ -39,6 +39,9 @@ async def on_ready():
     for member in client.get_server("412943020850413570").members:
         if member.game != None and member.game.name == "osu!" and discord.utils.find(lambda r: r.name.endswith(" hour"), member.roles):
             reminders.append(Reminder(member))
+        # would use >"any" in ...< but not sure how roles are formatted
+        elif member.game != None and discord.utils.find(lambda r: r.name.endswith(" any"), member.roles):
+            reminders.append(Reminder(member))
 
 @client.event
 async def on_message(message):
@@ -67,11 +70,16 @@ async def on_member_update(before, after):
 
 async def update_role(message):
     role_name = message.content.split(maxsplit=1)[1].lower()
+    hour_options = ["0.5", "1", "2", "3"]
+    role_options = []
+    for hour in hour_options:
+        role_options.append(hour + " hour")
+        role_options.append(hour + " hour any")
     if role_name == "none":
         await client.remove_roles(message.author, *[r for r in message.author.roles if r.name.endswith(" hour")])
         await client.send_message(message.channel, "Reminders stopped for {}".format(message.author.mention))
         logging.info("Removing roles from {} ({})".format(message.author.name, message.author.id))
-    elif role_name in ["0.5 hour", "1 hour", "2 hour", "3 hour"]:
+    elif role_name in role_options:
         role = discord.utils.get(message.server.roles, name=role_name)
         await client.replace_roles(message.author, *([r for r in message.author.roles if not r.name.endswith(" hour")] + [role]))
         await client.send_message(message.channel, "{} reminders set for {}".format(role_name, message.author.mention))
