@@ -52,7 +52,7 @@ async def on_message(message):
 @client.event
 async def on_member_update(before, after):
     # check if member has a reminder role
-    reminder_role = discord.utils.find(lambda r: "hour" in r.name, after.roles):
+    reminder_role = discord.utils.find(lambda r: "hour" in r.name, after.roles)
     if not reminder_role:
         return
 
