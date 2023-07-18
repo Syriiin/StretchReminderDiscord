@@ -1,10 +1,10 @@
+import json
+import logging
+import os
+import time
+
 import discord
 from discord.ext import commands, tasks
-
-import os
-import json
-import time
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class AutoReminders(commands.Cog):
     
     def cog_check(self, ctx):
         # Only cog only usable within osu! Stretch reminders guild
-        return ctx.guild.id == self.bot.config["guild_id"]
+        return ctx.guild is not None and ctx.guild.id == self.bot.config["guild_id"]
 
     def add_reminder(self, member):
         if next((r for r in self.reminders if r.member == member), None) is not None:
@@ -155,9 +155,9 @@ class AutoReminders(commands.Cog):
         for member in guild.members:
             self.add_reminder(member)
 
-def setup(bot):
+async def setup(bot):
     abs_path = os.path.abspath(os.path.dirname(__file__))
     config_path = os.path.join(abs_path, "autoreminders.config.json")
     with open(config_path) as fp:
         config = json.load(fp)
-        bot.add_cog(AutoReminders(bot, config))
+        await bot.add_cog(AutoReminders(bot, config))

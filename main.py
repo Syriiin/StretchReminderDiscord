@@ -1,11 +1,13 @@
-import discord
-
+import asyncio
 import json
 import logging
 
+import discord
+
 from bot import StretchRemindersBot
 
-def main():
+
+async def main():
     # Setup logging
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -30,14 +32,15 @@ def main():
     intents = discord.Intents.default()
     intents.members = True
     intents.presences = True
+    intents.message_content = True
     bot = StretchRemindersBot(command_prefix="!", intents=intents)
 
     # Load extensions
-    bot.load_extension("cogs.admin")
-    bot.load_extension("cogs.autoreminders")
+    await bot.load_extension("cogs.admin")
+    await bot.load_extension("cogs.autoreminders")
 
     # Start bot loop
-    bot.run(config)
+    await bot.start(config)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

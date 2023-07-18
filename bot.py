@@ -1,9 +1,9 @@
+import logging
+import sys
+import traceback
+
 import discord
 from discord.ext import commands
-
-import sys
-import logging
-import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class StretchRemindersBot(commands.Bot):
         logger.info("Bot ready...")
         await self.change_presence(activity=discord.Game(name="at the gym"))
     
-    def run(self, config):
+    async def start(self, config):
         logger.info("Bot starting...")
         self.config = config
-        super().run(config["bot_token"])
+        await super().start(config["bot_token"])
