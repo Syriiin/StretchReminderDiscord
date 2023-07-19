@@ -59,5 +59,4 @@ target/
 
 
 # Project specific
-config.json
-cogs/*.config.json
+*config.json
