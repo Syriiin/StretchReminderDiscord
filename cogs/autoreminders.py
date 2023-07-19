@@ -27,7 +27,7 @@ class AssignableRole(commands.RoleConverter):
             raise commands.BadArgument('Role "{}" is not assignable.'.format(argument))
 
 class AutoReminders(commands.Cog):
-    def __init__(self, bot, config):
+    def __init__(self, bot: commands.Bot, config):
         self.bot = bot
         self.config = config
         self.reminders = []
@@ -60,7 +60,14 @@ class AutoReminders(commands.Cog):
         self.reminders = [r for r in self.reminders if r.member != member]
 
     @commands.Cog.listener()
+    async def on_presence_update(self, before, after):
+        await self.check_user_update(before, after)
+
+    @commands.Cog.listener()
     async def on_member_update(self, before, after):
+        await self.check_user_update(before, after)
+
+    async def check_user_update(self, before, after):
         # check if member has a reminder role
         reminder_role = discord.utils.find(lambda r: "hour" in r.name, after.roles)
         if not reminder_role:
